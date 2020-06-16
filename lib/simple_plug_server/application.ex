@@ -7,8 +7,11 @@ defmodule SimplePlugServer.Application do
 
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: SimplePlugServer.Worker.start_link(arg)
-      # {SimplePlugServer.Worker, arg}
+      Plug.Cowboy.child_spec(
+        scheme: :http,
+        plug: SimplePlugServer.Endpoint,
+        options: [port: Application.get_env(:simple_plug_server, :port)]
+      )
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
