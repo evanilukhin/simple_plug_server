@@ -1,25 +1,35 @@
-# Elixir CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-elixir/ for more details
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
-      # specify the version here
       - image: elixir:1.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/repo
     steps:
       - checkout
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - run: mix deps.compile
 
-      # specify any bash command here prefixed with `run: `
+  test:
+    docker:
+      - image: elixir:1.10
+    working_directory: ~/repo
+    steps:
+      - checkout
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix deps.compile
       - run: mix test
+workflows:
+  build:
+    branches:
+      only:
+        - master
+        - development
+    jobs:
+      - build
+  test:
+    jobs:
+      - test
