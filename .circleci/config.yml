@@ -1,10 +1,6 @@
 version: 2.1
 jobs:
   build:
-    branches:
-      only:
-        - master
-        - development
     docker:
       - image: elixir:1.10
     working_directory: ~/repo
@@ -27,9 +23,15 @@ jobs:
       - run: mix deps.compile
       - run: mix test
 workflows:
+  version: 2
   build:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              only:
+                - master
+                - development
   test:
     jobs:
       - test
