@@ -10,7 +10,7 @@ defmodule SimplePlugServer.Application do
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: SimplePlugServer.Endpoint,
-        options: [port: Application.get_env(:simple_plug_server, :port)]
+        options: [port: String.to_integer(Application.get_env(:simple_plug_server, :port))]
       )
     ]
 
