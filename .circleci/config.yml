@@ -46,7 +46,7 @@ workflows:
             - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
           family: "${AWS_RESOURCE_NAME_PREFIX}-task"
           cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster2"
-          container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX},tag=${CIRCLE_SHA1}"
+          container-image-name-updates: "container=simpe-plug-server,tag=${CIRCLE_SHA1}"
           filters:
             branches:
               only:
