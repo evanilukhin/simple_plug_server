@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.9.1
+  aws-ecs: circleci/aws-ecs@1.2.0
 jobs:
   build:
     docker:
@@ -28,9 +31,22 @@ jobs:
           path: _build/test/lib/simple_plug_server
 workflows:
   version: 2
-  build:
+  build-and-deploy:
     jobs:
-      - build:
+      - aws-ecr/build-and-push-image:
+          repo: "${AWS_RESOURCE_NAME_PREFIX}"
+          tag: "${CIRCLE_SHA1}"
+          filters:
+            branches:
+              only:
+                - master
+                - development
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
+          family: "${AWS_RESOURCE_NAME_PREFIX}-service"
+          cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
+          container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"
           filters:
             branches:
               only:
