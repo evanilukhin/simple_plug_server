@@ -44,14 +44,15 @@ workflows:
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
-          family: "${AWS_RESOURCE_NAME_PREFIX}-task"
-          cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster2"
+          family: "simple-plug-server-task"
+          cluster-name: "simple-plug-server-cluster2"
+          service-name: "simple-plug-server-service"
           container-image-name-updates: "container=simpe-plug-server,tag=${CIRCLE_SHA1}"
           filters:
             branches:
               only:
                 - master
                 - development
-  test:
-    jobs:
-      - test
+#  test:
+#    jobs:
+#      - test
