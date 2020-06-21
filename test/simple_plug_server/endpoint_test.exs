@@ -14,7 +14,7 @@ defmodule SimplePlugServer.EndpointTest do
     # Assert the response and status
     assert conn.state == :sent
     assert conn.status == 200
-    assert conn.resp_body == "World!"
+    assert conn.resp_body == "You are awesome!"
   end
 
   test "it returns 404 when no route matches" do

@@ -19,7 +19,7 @@ defmodule SimplePlugServer.Endpoint do
   # A simple route to test that the server is up
   # Note, all routes must return a connection as per the Plug spec.
   get "/hello" do
-    send_resp(conn, 200, "World!")
+    send_resp(conn, 200, "You are awesome!")
   end
 
   # A catchall route, 'match' will match no matter the request method,

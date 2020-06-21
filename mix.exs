@@ -23,7 +23,8 @@ defmodule SimplePlugServer.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:junit_formatter, "~> 3.1", only: [:test]}
     ]
   end
 end

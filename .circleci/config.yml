@@ -53,6 +53,6 @@ workflows:
               only:
                 - master
                 - development
-#  test:
-#    jobs:
-#      - test
+  test:
+    jobs:
+      - test
