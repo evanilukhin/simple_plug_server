@@ -1,4 +1,4 @@
-# Preparation
+# Prepare project
 ## Introduction
 
 In this series of posts, I'm going to show how to set up the CI/CD environment using AWS and CircleCI.
@@ -138,11 +138,13 @@ When you developing a new feature the process consists of the nest steps;
 8) Merge feature to the production
 9) Redeploy production
 
-# AWS
+# Build and and push images
 
 This chapter is about setting up the AWS environment. At the end of it you will have completely deployed application.
 Let's start. Almost all steps will be inside the [Amazon Container Services](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
 space.
+
+## Prepare environment for containers
 
 ### Create IAM user
 
@@ -193,9 +195,19 @@ settings use by default
 
 !ECR after creation.png
 
-Let's build our images that we made for development and master. For this step you should have installed 
-[AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) 
-how to it, see [Installing the AWS CLI version 2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html). 
+Great! You have repository and all required credentials to build and push images. Time to automatize it.
+
+## Configuring Circle CI
+
+Before you start to configure the pipeline, you will need to prepare the application
+following this fantastic [getting started](https://circleci.com/docs/2.0/getting-started/#section=getting-started) page.
+
+
+
+--------------
+
+Great! You automatized process of running tests and building images in the next charter you will see how to
+setup servers on the AWS infrastructure and redeploy them after successfully passed tests.
 
 
 
@@ -204,4 +216,6 @@ how to it, see [Installing the AWS CLI version 2](https://docs.aws.amazon.com/cl
 ### Initialize ECS cluster
 
 
-# CircleCI
+# Setup and update servers
+
+
