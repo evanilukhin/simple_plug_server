@@ -293,12 +293,20 @@ workflows:
                 - development
 ```
 
+Briefly about the steps of this job:
+* repo - the name of the repository (last part of the `815991645042.dkr.ecr.us-west-2.amazonaws.com/simple_plug_server`)
+* tag - tags that we apply to the built container, for the master branch it will add two tags: 
+master_02dacfb07f7c09107e2d8da9955461f025f7f443 and master_latest
+* requires - there you should describe the previous necessary steps, in this example we build an image only 
+if all tests pass
+* filters - describe for which branches this job should execute. There are a lot of other [filters](https://circleci.com/docs/2.0/configuration-reference/#filters-1)
+that you can use to customize a workflow
 
 But before you start to run this workflow you should add the next environment variables:
 * AWS_ACCESS_KEY_ID - access key for `circleci` that you obtained on [this step]()
 * AWS_SECRET_ACCESS_KEY - secret key for `circleci` that you obtained on [this step]()
 * AWS_REGION - region where placed your ECR instance
-* AWS_ECR_ACCOUNT_URL - url of the ECR(looks like 845991645040.dkr.ecr.us-west-2.amazonaws.com)
+* AWS_ECR_ACCOUNT_URL - url of the ECR(looks like 815991645042.dkr.ecr.us-west-2.amazonaws.com)
 
 !CircleCI ENV Settings example.png
 
