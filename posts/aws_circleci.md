@@ -284,6 +284,8 @@ workflows:
       - aws-ecr/build-and-push-image:
           repo: "simple_plug_server"
           tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
+          requires:
+            - test
           filters:
             branches:
               only:
@@ -296,6 +298,7 @@ But before you start to run this workflow you should add the next environment va
 * AWS_ACCESS_KEY_ID - access key for `circleci` that you obtained on [this step]()
 * AWS_SECRET_ACCESS_KEY - secret key for `circleci` that you obtained on [this step]()
 * AWS_REGION - region where placed your ECR instance
+* AWS_ECR_ACCOUNT_URL - url of the ECR(looks like 845991645040.dkr.ecr.us-west-2.amazonaws.com)
 
 !CircleCI ENV Settings example.png
 
