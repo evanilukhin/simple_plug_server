@@ -206,7 +206,98 @@ following this fantastic [getting started](https://circleci.com/docs/2.0/getting
 
 ### Tests
 
+The most popular use case of the Circle CI that I've seen is running tests (not all developers trust to external
+services to deploy applications). To run them you should define [a job](https://circleci.com/docs/2.0/jobs-steps/#jobs-overview)
+and add it as a step to [a workflow](https://circleci.com/docs/2.0/workflows/). There is an example of `test` workflow
+for the `simple_plug_server` application:
 
+```yaml
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: elixir:1.10
+        environment:
+          MIX_ENV: test
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix test
+      - store_test_results:
+          path: _build/test/lib/simple_plug_server
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
+```
+
+It has only the one workflow `test` with the one job `test`. This job has three parts: 
+* docker - where is defined a container inside which you will deploy test environment and run tests
+* working_directory - name of the folder where everything is happening
+* steps - the set of commands where you download code, setup dependencies and finally run tests. 
+You can also [cache dependencies](https://circleci.com/docs/2.0/caching/) on this step.
+
+We can also improve the representing of the failed tests, for it you should add a JUnit formatter for test results
+(for elixir it is the hex package [JUnitFormatter](https://github.com/victorolinasc/junit-formatter)) and specify
+the directory containing subdirectories of JUnit XML or Cucumber JSON test metadata files. 
+More information about it and how to add support for other languages and test frameworks look [here](https://circleci.com/docs/2.0/collect-test-data/).
+
+
+### Build and push containers
+
+On the previous steps we created the ECR repository and the user that can push images, time to setup CircleCI config.
+
+For work with images we will use the official orb for ECR [circleci/aws-ecr@6.9.1](https://circleci.com/orbs/registry/orb/circleci/aws-ecr)
+It significantly simplifies building and pushing images, let's add the new step to our config file:
+
+```yaml
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.9.1
+  aws-ecs: circleci/aws-ecs@1.2.0
+jobs:
+  test:
+    docker:
+      - image: elixir:1.10
+        environment:
+          MIX_ENV: test
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix test
+      - store_test_results:
+          path: _build/test/lib/simple_plug_server
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+      - test
+      - aws-ecr/build-and-push-image:
+          repo: "simple_plug_server"
+          tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
+          filters:
+            branches:
+              only:
+                - master
+                - development
+```
+
+
+But before you start to run this workflow you should add the next environment variables:
+* AWS_ACCESS_KEY_ID - access key for `circleci` that you obtained on [this step]()
+* AWS_SECRET_ACCESS_KEY - secret key for `circleci` that you obtained on [this step]()
+* AWS_REGION - region where placed your ECR instance
+
+!CircleCI ENV Settings example.png
 
 --------------
 

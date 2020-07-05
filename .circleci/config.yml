@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.9.1
+  aws-ecs: circleci/aws-ecs@1.2.0
 jobs:
   test:
     docker:
@@ -17,7 +20,16 @@ jobs:
           path: _build/test/lib/simple_plug_server
 workflows:
   version: 2
-  test:
+  test-and-build:
     jobs:
       - test
+      - aws-ecr/build-and-push-image:
+          repo: "${AWS_RESOURCE_NAME_PREFIX}"
+          tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
+          filters:
+            branches:
+              only:
+                - master
+                - development
+
 
