@@ -1,23 +1,9 @@
 version: 2.1
-orbs:
-  aws-ecr: circleci/aws-ecr@6.9.1
-  aws-ecs: circleci/aws-ecs@1.2.0
 jobs:
-  build:
-    docker:
-      - image: elixir:1.10
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
-      - run: mix deps.compile
-
   test:
     docker:
       - image: elixir:1.10
-        environment:  # environment variables for primary container
+        environment:
           MIX_ENV: test
     working_directory: ~/repo
     steps:
@@ -31,28 +17,7 @@ jobs:
           path: _build/test/lib/simple_plug_server
 workflows:
   version: 2
-  build-and-deploy:
-    jobs:
-      - aws-ecr/build-and-push-image:
-          repo: "${AWS_RESOURCE_NAME_PREFIX}"
-          tag: "${CIRCLE_SHA1}"
-          filters:
-            branches:
-              only:
-                - master
-                - development
-      - aws-ecs/deploy-service-update:
-          requires:
-            - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
-          family: "simple-plug-server-task"
-          cluster-name: "simple-plug-server-cluster2"
-          service-name: "simple-plug-server-service"
-          container-image-name-updates: "container=simpe-plug-server,tag=${CIRCLE_SHA1}"
-          filters:
-            branches:
-              only:
-                - master
-                - development
   test:
     jobs:
       - test
+

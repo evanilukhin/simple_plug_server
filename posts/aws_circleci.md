@@ -199,8 +199,12 @@ Great! You have repository and all required credentials to build and push images
 
 ## Configuring Circle CI
 
+The main idea is to run tests after each commit for all branches and deploy after changes in the development and master.
+
 Before you start to configure the pipeline, you will need to prepare the application
 following this fantastic [getting started](https://circleci.com/docs/2.0/getting-started/#section=getting-started) page.
+
+### Tests
 
 
 
