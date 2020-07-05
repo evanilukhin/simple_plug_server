@@ -140,4 +140,68 @@ When you developing a new feature the process consists of the nest steps;
 
 # AWS
 
+This chapter is about setting up the AWS environment. At the end of it you will have completely deployed application.
+Let's start. Almost all steps will be inside the [Amazon Container Services](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
+space.
+
+### Create IAM user
+
+When you log in the aws console first time you are log in under the root user. You have full access to every service and 
+the billing management console. To secure interaction with AWS it is a good practice to create a new user inside 
+the group that has only required permissions. 
+    
+A few words about managing permissions. There are two main ways to add them to users through [groups](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html)
+and [roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html). The main difference is in that groups is 
+a collection of users with same policies. Roles, in turn, can be used to delegate access not only to users but also 
+to other services and applications, we will use both. Let's create them
+
+! Window with button
+
+On the second step select the next policies
+
+* AmazonEC2ContainerRegistryFullAccess 
+* AWSCodeDeployRoleForECS 
+* AmazonEC2ContainerServiceFullAccess 
+* AmazonECSTaskExecutionRolePolicy 
+
+! Group after creation.png
+
+Then create the role that we will give to ecs to deploy our containers to ec2 instances 
+
+! Create role window
+
+and on the second step select in policies `AmazonEC2ContainerServiceforEC2Role`
+
+! Result
+
+More about it is showed [there](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html)
+
+And finally let's add a new user and add to the previously generated
+
+Create user that has only programmatic access because we will use it only from the circleci and terminal.
+
+Generate access keys. Save them, they will need you later
+
+
+### Create ECR
+
+a place where we will store containers an from where they will be deployed. Just go to the ECL and 
+click on the "Create repository" you will see the window where you should select the name for the repository. Other 
+settings use by default
+
+!ECR_create.png
+
+!ECR after creation.png
+
+Let's build our images that we made for development and master. For this step you should have installed 
+[AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) 
+how to it, see [Installing the AWS CLI version 2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html). 
+
+
+
+### Setup network
+
+### Initialize ECS cluster
+
+
 # CircleCI
