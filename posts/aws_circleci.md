@@ -310,18 +310,27 @@ But before you start to run this workflow you should add the next environment va
 
 !CircleCI ENV Settings example.png
 
---------------
+After successful build of the development and master branches you will see something like there: 
+
+
 
 Great! You automatized process of running tests and building images in the next charter you will see how to
 setup servers on the AWS infrastructure and redeploy them after successfully passed tests.
 
 
 
-### Setup network
-
-### Initialize ECS cluster
-
-
 # Setup and update servers
 
+After all previous steps you've got the images that's stored inside the ECR and the script that automatically build
+them. In this part of the tutorial we will: 
+* create and setup vps;
+* setup ecs clusters for development and production environments;
+* add deployment commands to the CircleCI scripts.
 
+Let's do it!
+
+### Setup Cluster
+
+
+
+### Initialize ECS cluster
