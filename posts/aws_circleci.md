@@ -323,14 +323,50 @@ setup servers on the AWS infrastructure and redeploy them after successfully pas
 
 After all previous steps you've got the images that's stored inside the ECR and the script that automatically build
 them. In this part of the tutorial we will: 
-* create and setup vps;
 * setup ecs clusters for development and production environments;
 * add deployment commands to the CircleCI scripts.
 
 Let's do it!
 
-### Setup Cluster
+## Initialize ECS cluster
 
+Creating of cluster consists of three steps:
+1. Create an empty cluster with a VPC
+2. Define the task that will launch the selected container
+3. Add service that will launch and maintain desired count of ec2 instances with the previously defined task
 
+### Create cluster
+Let's start with the definition of [cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html): 
 
-### Initialize ECS cluster
+> An Amazon ECS cluster is a logical grouping of tasks or services. 
+
+Roughly saying, clusters define scope and set of rules for the launched tasks. Creating of them is very simple:
+
+1. Select EC2 Linux + Networking you need two clusters one for development and one for master branches
+2. Select 1 On Demand t2.micro instance(or other type of ec2 instances), other configurations by default
+3. For the networking section I recommend to stay the parameters by default too. It will create a new VPC with
+[security group](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html) allowing income traffic
+to the 80 PORT.
+
+Yes that's all, you should create one for the development and one for the production. 
+
+### Define task
+
+1. Select EC2 launch type compatibility
+2. Choose the name for the task definition(or family like sometimes it's called)
+3. For the as the task role choose the role with the `AmazonECSTaskExecutionRolePolicy` policy that we  previously created 
+4. And finally add container, on this tab we are interested in the following fields
+   * Standard -> Image - initial image for the task should be copied from the ECR looks like 845992245040.dkr.ecr.us-west-2.amazonaws.com/simple_plug_server:master_latest
+   * Standard -> Port mappings - associate host 80 with the port which is using the our application and will be defined nex
+   * Advanced container configuration -> ENVIRONMENT -> Environment variables - define the variable with the name `PORT` and 
+   desired value for example - 4100. This value must be used in the port mapping as the container port
+   
+Great you created the first revision of the task definition. Don't forget to tasks for the other environment. 
+
+### Add service
+
+For the production environment repeat all these steps only changing container on the second step.
+
+### Add deployment scripts
+
+Great you have 
