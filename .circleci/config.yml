@@ -34,6 +34,7 @@ workflows:
                 - master
                 - development
       - aws-ecs/deploy-service-update:
+          name: deploy-development
           requires:
             - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
           family: "simple-plug-server-development"
@@ -45,6 +46,7 @@ workflows:
               only:
                 - development
       - aws-ecs/deploy-service-update:
+          name: deploy-production
           type: approval
           requires:
             - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
