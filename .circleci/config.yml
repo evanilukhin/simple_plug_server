@@ -45,11 +45,18 @@ workflows:
             branches:
               only:
                 - development
-      - aws-ecs/deploy-service-update:
-          name: deploy-production
+      - request-test-and-build:
           type: approval
           requires:
-            - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
+            - aws-ecs/deploy-service-update
+          filters:
+            branches:
+              only:
+                - master
+      - aws-ecs/deploy-service-update:
+          name: deploy-production
+          requires:
+            - request-test-and-build
           family: "simple-plug-server-production"
           cluster-name: "SimplePlugServer-production"
           service-name: "simple-plug-server-production"
