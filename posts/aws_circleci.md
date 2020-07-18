@@ -355,18 +355,39 @@ Yes that's all, you should create one for the development and one for the produc
 1. Select EC2 launch type compatibility
 2. Choose the name for the task definition(or family like sometimes it's called)
 3. For the as the task role choose the role with the `AmazonECSTaskExecutionRolePolicy` policy that we  previously created 
-4. And finally add container, on this tab we are interested in the following fields
+4. Select the memory limit for example 128 MB if you server is not going to handle a lot of complex requests
+5. And finally add container, on this tab we are interested in the following fields
    * Standard -> Image - initial image for the task should be copied from the ECR looks like 845992245040.dkr.ecr.us-west-2.amazonaws.com/simple_plug_server:master_latest
    * Standard -> Port mappings - associate host 80 with the port which is using the our application and will be defined nex
    * Advanced container configuration -> ENVIRONMENT -> Environment variables - define the variable with the name `PORT` and 
    desired value for example - 4100. This value must be used in the port mapping as the container port
    
-Great you created the first revision of the task definition. Don't forget to tasks for the other environment. 
+Great you've created the first revision of the task definition. Of course these tasks can be launched right inside 
+cluster, but we will use services to simplify updating tasks revisions. Let's add them. 
 
 ### Add service
 
-For the production environment repeat all these steps only changing container on the second step.
+To create a service just click on the `Create` button on the `Services` and fill the form:
+1. Select EC2 in the Launch type selector, because we are deploying our tasks on EC2 instances
+2. In the `Task Definition` select the task and revision that you are created earlier
+3. In the `Cluster` select the cluster where you want to define a service. When you are creating service from a cluster
+this field will be already selected
+4. Service type - REPLICA
+5. Number of tasks - 1 because we do not care about scaling for now.
+6. Other setting set by default
 
-### Add deployment scripts
+Great! After all manipulations you've got two EC2 instances with running applications. They are available 
+by Public DNS or IP.
 
-Great you have 
+Now let's go to the final part of this tutorial.
+ 
+## Add deployment scripts
+
+With an official orb [aws-ecs](https://circleci.com/orbs/registry/orb/circleci/aws-ecs) you can make this very simple. 
+First of all you should add a couple of additional environment variables
+We already added all necessary environment variables in the second part of this tutorial so you should only modify the
+circleci config. 
+
+```yaml
+
+```
