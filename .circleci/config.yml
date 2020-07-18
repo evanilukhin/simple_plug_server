@@ -40,7 +40,7 @@ workflows:
           family: "simple-plug-server-development"
           cluster-name: "SimplePlugServer-development"
           service-name: "sps-dev-serv"
-          container-image-name-updates: "container=simple-plug-server-development,tag=${CIRCLE_SHA1}"
+          container-image-name-updates: "container=simple-plug-server-development,tag=${CIRCLE_BRANCH}_${CIRCLE_SHA1}"
           filters:
             branches:
               only:
@@ -60,7 +60,7 @@ workflows:
           family: "simple-plug-server-production"
           cluster-name: "SimplePlugServer-production"
           service-name: "simple-plug-server-production"
-          container-image-name-updates: "container=simple-plug-server-production,tag=${CIRCLE_SHA1}"
+          container-image-name-updates: "container=simple-plug-server-production,tag=${CIRCLE_BRANCH}_${CIRCLE_SHA1}"
           filters:
             branches:
               only:
