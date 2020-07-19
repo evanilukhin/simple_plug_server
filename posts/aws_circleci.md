@@ -388,6 +388,102 @@ First of all you should add a couple of additional environment variables
 We already added all necessary environment variables in the second part of this tutorial so you should only modify the
 circleci config. 
 
+Result version of the `.circleci/config.yml`
 ```yaml
-
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.9.1
+  aws-ecs: circleci/aws-ecs@1.2.0
+jobs:
+  test:
+    docker:
+      - image: elixir:1.10
+        environment:
+          MIX_ENV: test
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix test
+      - store_test_results:
+          path: _build/test/lib/simple_plug_server
+workflows:
+  version: 2
+  test-build-deploy:
+    jobs:
+      - test
+      - aws-ecr/build-and-push-image:
+          repo: "simple_plug_server"
+          tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
+                - development
+      - aws-ecs/deploy-service-update:
+          name: deploy-development
+          requires:
+            - aws-ecr/build-and-push-image 
+          family: "simple-plug-server-development"
+          cluster-name: "SimplePlugServer-development"
+          service-name: "sps-dev-serv"
+          container-image-name-updates: "container=simple-plug-server-development,tag=${CIRCLE_BRANCH}_${CIRCLE_SHA1}"
+          filters:
+            branches:
+              only:
+                - development
+      - approve-deploy:
+          type: approval
+          requires:
+            - aws-ecr/build-and-push-image
+          filters:
+            branches:
+              only:
+                - master
+      - aws-ecs/deploy-service-update:
+          name: deploy-production
+          requires:
+            - approve-deploy
+          family: "simple-plug-server-production"
+          cluster-name: "SimplePlugServer-production"
+          service-name: "simple-plug-server-production"
+          container-image-name-updates: "container=simple-plug-server-production,tag=${CIRCLE_BRANCH}_${CIRCLE_SHA1}"
+          filters:
+            branches:
+              only:
+                - master
 ```
+
+In this file was added three new jobs. Two `aws-ecs/deploy-service-update` respond for the updating respective services 
+in the clusters and `request-test-and-build` that's wait confirmation before the last step for the master branch. For
+different branches flows will be a little different. It can be achieved by using 
+parameter `filters` in job definitions, where you can specify for which branches or git tags launch the jobs.
+
+development:    test -> aws-ecr/build-and-push-image -> deploy-development
+
+master:         test -> aws-ecr/build-and-push-image -> request-test-and-build -> deploy-production
+
+other branches: test
+
+I would like to tell about parameters for the job `aws-ecs/deploy-service-update`:
+* name - name is used to make jobs in a workflow more human-readable. I am sure you would agree that's `deploy-production`
+looks much more clearer than `aws-ecs/deploy-service-update`. 
+* requires - used to define order of jobs execution, namely the previous job that must be finished successfully.
+* family - there you should write the name of the task definition([Define task](define-task)) that you used when you 
+created the task
+* cluster-name - it's pretty obvious - name of the desired cluster where all magic happens
+* service-name - name of the service that's managing tasks inside the previously mentioned cluster
+* container-image-name-updates - updates the Docker image names and/or tag names of existing containers 
+                                 that had been defined in the previous task definition
+  * container - the name of container that you used when you added container to the task(circled in blue on the screenshot)
+  * tag - one of the tags that you are defined in the `aws-ecr/build-and-push-image` job, in this example it's a `${CIRCLE_BRANCH}_${CIRCLE_SHA1}`
+
+And it's all. When you push your branch with the new circleci config and start to work you will see something like that.
+
+I hope that this tutorial was helpful and was not wasted your time. If you have any question and problems feel free to 
+ask me about it in comments. 👋
