@@ -56,7 +56,7 @@ workflows:
       - aws-ecs/deploy-service-update:
           name: deploy-production
           requires:
-            - request-test-and-build
+            - approve-deploy
           family: "simple-plug-server-production"
           cluster-name: "SimplePlugServer-production"
           service-name: "simple-plug-server-production"
