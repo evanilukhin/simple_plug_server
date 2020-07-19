@@ -20,7 +20,7 @@ jobs:
           path: _build/test/lib/simple_plug_server
 workflows:
   version: 2
-  test-and-build:
+  test-build-deploy:
     jobs:
       - test
       - aws-ecr/build-and-push-image:
@@ -36,7 +36,7 @@ workflows:
       - aws-ecs/deploy-service-update:
           name: deploy-development
           requires:
-            - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
+            - aws-ecr/build-and-push-image
           family: "simple-plug-server-development"
           cluster-name: "SimplePlugServer-development"
           service-name: "sps-dev-serv"
@@ -45,7 +45,7 @@ workflows:
             branches:
               only:
                 - development
-      - request-test-and-build:
+      - approve-deploy:
           type: approval
           requires:
             - aws-ecr/build-and-push-image
